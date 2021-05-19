@@ -48,9 +48,8 @@ def run_full_pipeline(config_path):
     train, test = features_processing(train, test, params.train_params.target_col)
     train_sklearn_model(train, test, params.train_params.target_col, params.train_params.model_type,
                         params.output_model_fpath, params.train_params.random_state)
-    # visualizing metrics
-    # saving results
 
 
 if __name__ == "__main__":
     run_full_pipeline()
+
