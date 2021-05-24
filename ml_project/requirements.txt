@@ -1,0 +1,3 @@
+dataclasses
+marshmallow_dataclass
+yaml

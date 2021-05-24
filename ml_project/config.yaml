@@ -1,0 +1,10 @@
+
+input_fpath: "data/raw/heart.csv"
+output_model_fpath: "models/model_rf.pkl"
+splitting_params:
+  val_size: 0.2
+  random_state: 3
+train_params:
+  model_type: "RandomForestClassifier"
+  target_col: "target"
+  random_state: 4
