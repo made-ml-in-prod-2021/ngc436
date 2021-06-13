@@ -28,7 +28,6 @@ with DAG(
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
-    # TODO
     preprocess = DockerOperator(
         image="airflow-preprocess",
         command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
