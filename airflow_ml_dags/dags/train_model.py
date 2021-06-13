@@ -25,7 +25,7 @@ with DAG(
         command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
         task_id="docker-airflow-preprocess",
         do_xcom_push=False,
-        # fix to your path
+        # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
@@ -34,25 +34,25 @@ with DAG(
         command="--input-dir /data/processed/{{ ds }} --output-dir /data/processed/{{ ds }} --val-size 0.25",
         task_id="docker-airflow-train-test",
         do_xcom_push=False,
-        # fix to your path
+        # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
     train = DockerOperator(
         image="airflow-ml-train",
-        command="--input-dir /data/raw/{{ ds }} --output-model-dir /data/model/{{ ds }}",
+        command="--input-dir /data/raw/{{ ds }} --model-dir /data/model/{{ ds }}",
         task_id="docker-airflow-train",
         do_xcom_push=False,
-        # fix to your path
+        # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
     validate = DockerOperator(
         image="airflow-predict",
-        command="--input-dir /data/processed/{{ ds }} --output-dir /data/predicted/{{ ds }}",
+        command="--input-dir /data/processed/{{ ds }} --model-  --output-dir /data/predicted/{{ ds }}",
         task_id="docker-airflow-predict",
         do_xcom_push=False,
-        # fix to your path
+        # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data", "D:/MADE/ml-in-prod/ngc436/logs:/logs"]
     )
 

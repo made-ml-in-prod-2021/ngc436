@@ -18,10 +18,9 @@ with DAG(
         schedule_interval="@daily",
         start_date=days_ago(5),
 ) as dag:
-    # TODO: add stages
     predict = DockerOperator(
         image="airflow-predict",
-        command="--input-dir /data/processed/{{ ds }} --output-dir /data/predicted/{{ ds }}",
+        command="--input-dir /data/processed/{{ ds }} --model-dir /data/model/{{ ds }} --output-dir /data/predictions/{{ ds }}",
         task_id="docker-airflow-predict",
         do_xcom_push=False,
         volumes=["/Users/mikhail.maryufich/PycharmProjects/airflow_examples/data:/data"]
