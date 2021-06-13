@@ -77,7 +77,7 @@ services:
 
   ml_base:
     build:
-      context: images/airflow-ml-base
+      context: images/airflow-ml-train
     image: airflow-ml-base
     restart: "no"
 

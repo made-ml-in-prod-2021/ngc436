@@ -28,6 +28,14 @@ with DAG(
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
+    train = DockerOperator(
+        image="airflow-ml-train",
+        command="--input-dir /data/raw/{{ ds }} --output-dir /model/processed/{{ ds }}",
+        task_id="docker-airflow-preprocess",
+        do_xcom_push=False,
+        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
+    )
+
     preprocess = DockerOperator(
         image="airflow-preprocess",
         command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
