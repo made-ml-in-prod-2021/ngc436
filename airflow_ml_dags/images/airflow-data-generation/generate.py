@@ -9,13 +9,13 @@ from sdv.tabular import GaussianCopula
 def write_to_file(output_dir: str, data: pd.DataFrame):
     os.makedirs(output_dir, exist_ok=True)
     y = data[['target']]
-    y.to_csv(os.path.join(output_dir, "traget.csv"), index=None)
-    data.drop("target")
+    y.to_csv(os.path.join(output_dir, "target.csv"), index=None)
+    data.drop(columns="target")
     data.to_csv(os.path.join(output_dir, "data.csv"), index=None)
 
 
 @click.command("generate")
-@click.argument("output_dir")
+@click.option("--output-dir")
 def generate_data(output_dir: str, n: int = 500):
     df_dict = load_breast_cancer(as_frame=True)
     data = df_dict['data']

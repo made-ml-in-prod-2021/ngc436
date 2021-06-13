@@ -77,26 +77,32 @@ services:
 
   ml_base:
     build:
-      context: images/airflow-ml-train
+      context: images/airflow-ml-base
     image: airflow-ml-base
-    restart: "no"
-
-  predict:
-    build:
-      context: images/airflow-predict
-    image: airflow-predict
-    restart: "no"
-
-  download:
-    build:
-      context: images/airflow-download
-    image: airflow-download
     restart: "no"
 
   preprocess:
     build:
       context: images/airflow-preprocess
     image: airflow-preprocess
+    restart: "no"
+
+  train_test:
+    build:
+      context: images/airflow-train-test
+    image: airflow-train-test
+    restart: "no"
+
+  ml_train:
+    build:
+      context: images/airflow-ml-train
+    image: airflow-ml-train
+    restart: "no"
+
+  predict:
+    build:
+      context: images/airflow-predict
+    image: airflow-predict
     restart: "no"
 
 volumes:
