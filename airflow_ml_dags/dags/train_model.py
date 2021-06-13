@@ -13,32 +13,32 @@ default_args = {
 }
 
 with DAG(
-        "run_dags",
+        "train_model",
         default_args=default_args,
         schedule_interval="@daily",
         start_date=days_ago(5),
 ) as dag:
-    download = DockerOperator(
-        image="airflow-data-generation",
-        command="/data/raw/{{ ds }}",
-        network_mode="bridge",
-        task_id="docker-airflow-generate",
+
+    # TODO: rewrite dags
+    preprocess = DockerOperator(
+        image="airflow-preprocess",
+        command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
+        task_id="docker-airflow-preprocess",
         do_xcom_push=False,
-        # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
+        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
+    )
+
+    train_test_preparation = DockerOperator(
+        image="airflow-train-test",
+        command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
+        task_id="docker-airflow-train-test",
+        do_xcom_push=False,
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
     train = DockerOperator(
         image="airflow-ml-train",
         command="--input-dir /data/raw/{{ ds }} --output-dir /model/processed/{{ ds }}",
-        task_id="docker-airflow-preprocess",
-        do_xcom_push=False,
-        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
-    )
-
-    preprocess = DockerOperator(
-        image="airflow-preprocess",
-        command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
         task_id="docker-airflow-preprocess",
         do_xcom_push=False,
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
