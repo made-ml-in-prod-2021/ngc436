@@ -25,31 +25,35 @@ with DAG(
         command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
         task_id="docker-airflow-preprocess",
         do_xcom_push=False,
+        # fix to your path
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
     train_test_preparation = DockerOperator(
         image="airflow-train-test",
-        command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
+        command="--input-dir /data/processed/{{ ds }} --output-dir /data/processed/{{ ds }} --val-size 0.25",
         task_id="docker-airflow-train-test",
         do_xcom_push=False,
+        # fix to your path
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
     train = DockerOperator(
         image="airflow-ml-train",
-        command="--input-dir /data/raw/{{ ds }} --output-dir /model/processed/{{ ds }}",
-        task_id="docker-airflow-preprocess",
+        command="--input-dir /data/raw/{{ ds }} --output-model-dir /data/model/{{ ds }}",
+        task_id="docker-airflow-train",
         do_xcom_push=False,
+        # fix to your path
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
 
-    predict = DockerOperator(
+    validate = DockerOperator(
         image="airflow-predict",
         command="--input-dir /data/processed/{{ ds }} --output-dir /data/predicted/{{ ds }}",
         task_id="docker-airflow-predict",
         do_xcom_push=False,
-        volumes=["/Users/mikhail.maryufich/PycharmProjects/airflow_examples/data:/data"]
+        # fix to your path
+        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data", "D:/MADE/ml-in-prod/ngc436/logs:/logs"]
     )
 
-    download >> preprocess >> predict
+    preprocess >> train_test_preparation >> train >> validate

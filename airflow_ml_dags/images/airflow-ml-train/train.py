@@ -1,22 +1,19 @@
 import os
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from joblib import dump
 
 import click
 
-def _x_y_util(data):
-    y = data['target']
-    x = data.drop('target')
-    return x, y
 
 @click.command("train")
 @click.option("--input-dir")
 @click.option("--output-model-dir")
 def train(input_dir: str, output_model_dir: str):
-    train_data = pd.read_csv(os.path.join(input_dir, f"data_train_{{ ds }}.csv"))
-    X_train, y_train = _x_y_util()
-    test_data = pd.read_csv(os.path.join(input_dir, f"data_test_{{ ds }}.csv"))
+    train_X = pd.read_csv(os.path.join(input_dir, "train_X.csv"))
+    train_y = pd.read_csv(os.path.join(input_dir, "train_y.csv"))
     model = RandomForestClassifier()
-    model.fit(train_data)
-    model.score()
-    # TODO
+    model.fit(train_X)
+    score = model.score(train_X, train_y)
+    # TODO: save to log
+    dump(model, os.path.join(output_model_dir, 'model.joblib'))
