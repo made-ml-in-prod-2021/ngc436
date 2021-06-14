@@ -6,6 +6,7 @@ from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.sensors.python import PythonSensor
 from airflow.utils.dates import days_ago
 
+DAG_NAME = "train_model"
 
 EXP_NAME = "experiment_rf"
 MODEL_NAME = "rf"
@@ -19,15 +20,19 @@ default_args = {
 }
 
 
-def _wait_for_files():
-    if os.path.exists("data/processed/{{ ds }}/target.csv") and \
-            os.path.exists("data/processed/{{ ds }}/data.csv"):
-        return 0
-    return 1
+def _wait_for_files(**kwargs):
+    ds = kwargs["ds"]
+    print(f"Checking path /data/processed/{ds}/target.csv")
+    if os.path.exists(f"/data/processed/{ds}/target.csv") and \
+            os.path.exists(f"/data/processed/{ds}/data.csv"):
+        print("Cool! Paths found")
+        return 1
+    print("Not found the required paths")
+    return 0
 
 
 with DAG(
-        "train_model",
+        DAG_NAME,
         default_args=default_args,
         schedule_interval="@weekly",
         start_date=days_ago(5),
@@ -35,11 +40,16 @@ with DAG(
 
     preprocess = DockerOperator(
         image="airflow-preprocess",
-        command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",
+        command="preprocess "
+                "--input-dir /data/raw/{{ ds }}"
+                " --output-dir /data/processed/{{ ds }}",
         task_id="docker-airflow-preprocess",
         do_xcom_push=False,
+        api_version='auto',
+        auto_remove=True,
+        docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
-        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
+        volumes=["/tmp/data:/data"]
     )
 
     wait = PythonSensor(
@@ -53,32 +63,48 @@ with DAG(
 
     train_test_preparation = DockerOperator(
         image="airflow-train-test",
-        command="--input-dir /data/processed/{{ ds }} --output-dir /data/processed/{{ ds }} --val-size 0.25",
+        command="train-test "
+                "--input-dir /data/processed/{{ ds }} "
+                "--output-dir /data/processed/{{ ds }} "
+                "--val-size 0.25",
         task_id="docker-airflow-train-test",
-        depends_on_past=True,
         do_xcom_push=False,
+        api_version='auto',
+        auto_remove=True,
+        docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
-        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
+        volumes=["/tmp/data:/data"]
     )
 
     train = DockerOperator(
         image="airflow-ml-train",
-        command="--input-dir /data/raw/{{ ds }} --model-dir /data/model/{{ ds }}",
+        command="train "
+                "--input-dir /data/processed/{{ ds }} "
+                "--output-model-dir /data/model/{{ ds }}",
         task_id="docker-airflow-train",
         environment={'EXP_NAME': EXP_NAME, 'MODEL_NAME': MODEL_NAME},
-        do_xcom_push=True,
+        network_mode="bridge",
+        do_xcom_push=False,
+        api_version='auto',
+        auto_remove=True,
+        docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
-        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
+        volumes=["/tmp/data:/data"]
     )
 
     validate = DockerOperator(
-        image="airflow-predict",
-        command="--input-dir /data/processed/{{ ds }} --model-  --output-dir /data/predicted/{{ ds }}",
-        task_id="docker-airflow-predict",
+        image="airflow-validate",
+        command="validate "
+                "--input-dir /data/processed/{{ ds }} ",
+        task_id="docker-airflow-validate",
         environment={'EXP_NAME': EXP_NAME, 'MODEL_NAME': MODEL_NAME},
-        do_xcom_push=True,
+        network_mode="bridge",
+        do_xcom_push=False,
+        api_version='auto',
+        auto_remove=True,
+        docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
-        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data", "D:/MADE/ml-in-prod/ngc436/logs:/logs"]
+        volumes=["/tmp/data:/data", "/tmp/logs:/logs"]
     )
 
     preprocess >> wait >> train_test_preparation >> train >> validate

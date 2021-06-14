@@ -1,26 +1,26 @@
 import os
-import click
-import pandas as pd
-from joblib import load
-from airflow.models import Variable
 
+import click
+import mlflow
+import pandas as pd
 from mlflow.tracking import MlflowClient
 
-import mlflow
 
-mlflow.set_tracking_uri("http://localhost:5000")
-EXP_NAME = Variable.get("EXP_NAME")
-MODEL_NAME = Variable.get("MODEL_NAME")
+@click.group()
+def cli():
+    pass
 
 
-@click.command("predict")
+@cli.command()
 @click.option("--input-dir")
-@click.option("--model-dir")
 @click.option("--output-dir")
-def predict(input_dir: str, model_dir: str, output_dir: str):
+def predict(input_dir: str, output_dir: str):
+    # !! not a good solution: set your ip
+    mlflow.set_tracking_uri("http://<your_ip>")
+    MODEL_NAME = os.environ["MODEL_NAME"]
+
     data_X = pd.read_csv(os.path.join(input_dir, "data.csv"))
     data_y = pd.read_csv(os.path.join(input_dir, "target.csv"))
-    # model = load(os.path.join(model_dir, "model.joblib"))
 
     client = MlflowClient()
     reg_model = client.get_registered_model(MODEL_NAME)
@@ -35,3 +35,7 @@ def predict(input_dir: str, model_dir: str, output_dir: str):
     predictions = model.predict(data_X, data_y)
     data_y['res'] = predictions
     data_y[['res']].to_csv(os.path.join(output_dir, 'predictions.csv'))
+
+
+if __name__ == "__main__":
+    cli()
