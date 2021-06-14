@@ -25,7 +25,7 @@ def predict(input_dir: str, model_dir: str, output_dir: str):
 
     client = MlflowClient()
     reg_model = client.get_registered_model(MODEL_NAME)
-    latest_version = reg_model.latest_versions[0]
+    latest_version = [v for v in reg_model.latest_versions if v.current_stage == "Production"]
 
     local_path = client.get_model_version_download_uri(MODEL_NAME, latest_version.version)
     model = mlflow.sklearn.load_model(local_path)
