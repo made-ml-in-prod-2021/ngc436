@@ -5,8 +5,12 @@ from joblib import load
 import logging
 import yaml
 
+import mlflow
+from mlflow.tracking import MlflowClient
+
 DEFAUL_LOGGING_CONFIG_FILEPATH = "logging.conf.yaml"
 
+mlflow.set_tracking_uri("http://mlflow-webserver:5000")
 
 def setup_logging():
     """Reading logger config from yaml"""
