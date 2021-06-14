@@ -4,7 +4,6 @@ import pandas as pd
 from joblib import load
 from airflow.models import Variable
 
-import mlflow
 from mlflow.tracking import MlflowClient
 
 import mlflow
@@ -25,7 +24,10 @@ def predict(input_dir: str, model_dir: str, output_dir: str):
 
     client = MlflowClient()
     reg_model = client.get_registered_model(MODEL_NAME)
-    latest_version = [v for v in reg_model.latest_versions if v.current_stage == "Production"]
+    try:
+        latest_version = [v for v in reg_model.latest_versions if v.current_stage == "Production"][-1]
+    except IndexError:
+        raise
 
     local_path = client.get_model_version_download_uri(MODEL_NAME, latest_version.version)
     model = mlflow.sklearn.load_model(local_path)
