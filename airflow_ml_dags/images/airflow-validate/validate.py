@@ -10,7 +10,7 @@ from mlflow.tracking import MlflowClient
 
 DEFAUL_LOGGING_CONFIG_FILEPATH = "logging.conf.yaml"
 
-mlflow.set_tracking_uri("http://mlflow-webserver:5000")
+mlflow.set_tracking_uri("http://localhost:5000")
 
 def setup_logging():
     """Reading logger config from yaml"""
@@ -28,6 +28,10 @@ def validate(input_dir: str, model_dir: str):
     val_X = pd.read_csv(os.path.join(input_dir, "val_X.csv"))
     val_y = pd.read_csv(os.path.join(input_dir, "val_y.csv"))
     model = load("model.joblib")
+
+    client = MlflowClient()
+    exp = client.get_experiment_by_name(EXP_NAME)
+
     model_ds = model_dir.split('/')[-1]
     score = model.score(val_X, val_y)
 
