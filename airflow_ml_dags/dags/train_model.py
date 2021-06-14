@@ -15,11 +15,10 @@ default_args = {
 with DAG(
         "train_model",
         default_args=default_args,
-        schedule_interval="@daily",
+        schedule_interval="@weekly",
         start_date=days_ago(5),
 ) as dag:
 
-    # TODO: rewrite dags
     preprocess = DockerOperator(
         image="airflow-preprocess",
         command="--input-dir /data/raw/{{ ds }} --output-dir /data/processed/{{ ds }}",

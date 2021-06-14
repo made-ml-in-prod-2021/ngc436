@@ -69,16 +69,42 @@ services:
     environment: *airflow_environment
     command: scheduler
 
-  data_generation:
+  mlflow-db:
+    restart: always
+    image: mysql/mysql-server:5.7.28
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=mlflow
+      - MYSQL_USER=mlflow
+      - MYSQL_PASSWORD=mlflow
+      - MYSQL_ROOT_PASSWORD=mlflow
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  mlflow-webserver:
     build:
-      context: images/airflow-data-generation
-    image: airflow-data-generation
-    restart: "no"
+      context: images/mlflow-webserver
+    restart: always
+    image: mlflow-webserver
+    depends_on:
+      - mlflow-db
+    ports:
+      - "5000:5000"
+    command: --backend-store-uri mysql+pymysql://mlflow:mlflow@mlflow-db:3306/mlflow --default-artifact-root /tmp/mlruns --host 0.0.0.0
+    volumes:
+      - /tmp/mlruns:/tmp/mlruns
 
   ml_base:
     build:
       context: images/airflow-ml-base
     image: airflow-ml-base
+    restart: "no"
+
+  data_generation:
+    build:
+      context: images/airflow-data-generation
+    image: airflow-data-generation
     restart: "no"
 
   preprocess:
@@ -107,3 +133,4 @@ services:
 
 volumes:
   logs:
+  dbdata:

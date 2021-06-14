@@ -23,7 +23,6 @@ with DAG(
         command="--input-dir /data/processed/{{ ds }} --model-dir /data/model/{{ ds }} --output-dir /data/predictions/{{ ds }}",
         task_id="docker-airflow-predict",
         do_xcom_push=False,
-        volumes=["/Users/mikhail.maryufich/PycharmProjects/airflow_examples/data:/data"]
+        # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
+        volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
     )
-
-
