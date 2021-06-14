@@ -49,6 +49,7 @@ with DAG(
         auto_remove=True,
         docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
+        # volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
         volumes=["/tmp/data:/data"]
     )
 
@@ -73,6 +74,7 @@ with DAG(
         auto_remove=True,
         docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
+        # volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
         volumes=["/tmp/data:/data"]
     )
 
@@ -89,6 +91,7 @@ with DAG(
         auto_remove=True,
         docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
+        # volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
         volumes=["/tmp/data:/data"]
     )
 
@@ -104,6 +107,7 @@ with DAG(
         auto_remove=True,
         docker_url="unix://var/run/docker.sock",
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
+        # volumes=["D:/MADE/ml-in-prod/ngc436/data:/data", "D:/MADE/ml-in-prod/ngc436/logs:/logs"]
         volumes=["/tmp/data:/data", "/tmp/logs:/logs"]
     )
 

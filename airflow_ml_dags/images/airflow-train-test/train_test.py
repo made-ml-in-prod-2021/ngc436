@@ -15,7 +15,7 @@ def cli():
 @click.option("--output-dir")
 @click.option("--val-size", type=float)
 def train_test(input_dir: str,
-               output_dir: str, val_size: float):
+                           output_dir: str, val_size: float):
     data_X = pd.read_csv(os.path.join(input_dir, "data.csv"))
     data_y = pd.read_csv(os.path.join(input_dir, "target.csv"))
     X_train, X_val, y_train, y_val = train_test_split(

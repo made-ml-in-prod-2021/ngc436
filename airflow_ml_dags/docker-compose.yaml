@@ -126,6 +126,12 @@ services:
     image: airflow-ml-train
     restart: "no"
 
+  validate:
+    build:
+      context: images/airflow-validate
+    image: airflow-validate
+    restart: "no"
+
   predict:
     build:
       context: images/airflow-predict

@@ -15,8 +15,7 @@ def cli():
 @click.option("--input-dir")
 @click.option("--output-dir")
 def predict(input_dir: str, output_dir: str):
-    # !! not a good solution: set your ip
-    mlflow.set_tracking_uri("http://<your_ip>")
+    mlflow.set_tracking_uri("http://192.168.1.58:5000")
     MODEL_NAME = os.environ["MODEL_NAME"]
 
     data_X = pd.read_csv(os.path.join(input_dir, "data.csv"))

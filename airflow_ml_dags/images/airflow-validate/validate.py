@@ -1,5 +1,7 @@
 import logging
 import os
+import time
+from pprint import pprint
 
 import click
 import mlflow
@@ -7,7 +9,7 @@ import pandas as pd
 import yaml
 from mlflow.tracking import MlflowClient
 
-DEFAUL_LOGGING_CONFIG_FILEPATH = "logging.conf.yaml"
+DEFAUL_LOGGING_CONFIG_FILEPATH = "/logging.conf.yaml"
 
 
 def setup_logging():
@@ -38,7 +40,11 @@ def validate(input_dir: str):
     client = MlflowClient()
     exp = client.get_experiment_by_name(EXP_NAME)
     runs = client.list_run_infos(exp.experiment_id)
+    pprint(runs)
     last_run = max(runs, key=lambda x: x.end_time)
+
+    time.sleep(10)
+
     logged_artifacts = client.list_artifacts(last_run.run_id)
     logged_model = logged_artifacts[0]
 
@@ -50,7 +56,7 @@ def validate(input_dir: str):
     local_path = client.get_model_version_download_uri(MODEL_NAME, latest_version.version)
     model = mlflow.sklearn.load_model(local_path)
     score = model.score(val_X, val_y)
-    logger_metrics.info(f"got metric {score} for model {local_path}")
+    logger_metrics.info(f"got metric {score} for model")
 
     exp = mlflow.get_experiment_by_name(EXP_NAME)
     if not exp:

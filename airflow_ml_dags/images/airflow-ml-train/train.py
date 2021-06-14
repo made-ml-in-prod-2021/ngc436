@@ -16,9 +16,9 @@ def cli():
 @click.option("--input-dir")
 @click.option("--output-model-dir")
 def train(input_dir: str, output_model_dir: str):
-    mlflow.set_tracking_uri("http://192.168.1.58:5000")
+    # Not a good solution
+    mlflow.set_tracking_uri("http://<set-your-ip>")
     EXP_NAME = os.environ["EXP_NAME"]
-    MODEL_NAME = os.environ["MODEL_NAME"]
 
     train_X = pd.read_csv(os.path.join(input_dir, "train_X.csv"))
     train_y = pd.read_csv(os.path.join(input_dir, "train_y.csv"))
