@@ -7,7 +7,6 @@ import click
 from airflow.models import Variable
 
 import mlflow
-from mlflow.tracking import MlflowClient
 
 mlflow.set_tracking_uri("http://localhost:5000")
 EXP_NAME = Variable.get("EXP_NAME")

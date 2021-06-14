@@ -3,9 +3,13 @@ from datetime import timedelta
 
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
-from airflow.sensors.filesystem import FileSensor
 from airflow.sensors.python import PythonSensor
 from airflow.utils.dates import days_ago
+
+
+EXP_NAME = "experiment_rf"
+MODEL_NAME = "rf"
+
 
 default_args = {
     "owner": "airflow",
@@ -61,7 +65,7 @@ with DAG(
         image="airflow-ml-train",
         command="--input-dir /data/raw/{{ ds }} --model-dir /data/model/{{ ds }}",
         task_id="docker-airflow-train",
-        environment={'EXP_NAME': 'experiment', 'MODEL_NAME': 'model'},
+        environment={'EXP_NAME': EXP_NAME, 'MODEL_NAME': MODEL_NAME},
         do_xcom_push=True,
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data"]
@@ -71,7 +75,7 @@ with DAG(
         image="airflow-predict",
         command="--input-dir /data/processed/{{ ds }} --model-  --output-dir /data/predicted/{{ ds }}",
         task_id="docker-airflow-predict",
-        environment={'EXP_NAME': 'experiment', 'MODEL_NAME': 'model'},
+        environment={'EXP_NAME': EXP_NAME, 'MODEL_NAME': MODEL_NAME},
         do_xcom_push=True,
         # !!! HOST folder(NOT IN CONTAINER) replace with yours !!!
         volumes=["D:/MADE/ml-in-prod/ngc436/data:/data", "D:/MADE/ml-in-prod/ngc436/logs:/logs"]
