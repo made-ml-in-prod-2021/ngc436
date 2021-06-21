@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: online-inference
+  labels:
+    app: inference
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      app: inference
+  template:
+    metadata:
+      labels:
+        app: inference
+    spec:
+      containers:
+        - name: app
+          image: app:3.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 500
+          resources:
+            limits:
+              cpu: "4"
+              memory: "4G"
+            requests:
+              cpu: "0.25"
+              memory: "1G"
