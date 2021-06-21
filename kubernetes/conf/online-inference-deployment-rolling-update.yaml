@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: online-inference
+  labels:
+    app: inference
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: "0%"
+      maxUnavailable: "100%"
+  selector:
+    matchLabels:
+      app: inference
+  template:
+    metadata:
+      labels:
+        app: inference
+    spec:
+      containers:
+        - name: app
+          image: app:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              cpu: "0.25"
+              memory: "200M"
+            requests:
+              cpu: "0.1"
+              memory: "100M"
