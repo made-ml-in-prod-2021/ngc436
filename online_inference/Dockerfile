@@ -1,5 +1,9 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
-RUN pip install -r /build/requirements.txt
+COPY ./requirements.txt /tmp/
+
+RUN pip install -r /tmp/requirements.txt
 
 COPY ./app /app
+
+ENTRYPOINT ["python3", "/app/main.py"]
