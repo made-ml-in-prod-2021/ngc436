@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+  labels:
+    app: predict
+spec:
+  containers:
+  - name: app
+    image: app:latest
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 5000
+    env:
+      - name: "STARTUP_DELAY"
+        value: "20"
+      - name: "EXEC_DURATION"
+        value: "60"
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 5000
+      initialDelaySeconds: 25
+      periodSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /readiness
+        port: 5000
+      initialDelaySeconds: 25
+      periodSeconds: 5
+    resources:
+      limits:
+        cpu: "4"
+        memory: "4G"
+      requests:
+        cpu: "1"
+        memory: "1G"
